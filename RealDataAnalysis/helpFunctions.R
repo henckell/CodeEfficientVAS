@@ -1,4 +1,5 @@
-# library(ggplot2)
+#function to compute estimated variances given for our two estimates of interest
+# for any given data, adjacency matrix and pair (X,Y)
 CIeval <- function(data,B,x,y){
    
   O <- ComputeO(x,y,B)
@@ -44,46 +45,32 @@ CIeval <- function(data,B,x,y){
   return(results)
 }
 
-
-CIplot <- function(ci){
-  upper <- c()
-  lower <- c()
-  for(i in 1:3){
-    lower[i] <- ci[[i]][1]
-    upper[i] <- ci[[i]][2]
-  }
-
-  diff  <- upper - lower
-  print(diff)
-  
-  data <- data.frame(U=upper,
-                   L=lower,
-                   class = c("empty","parents","O"))
-  
-  ggplot(data,aes(y=U,x=class)) + geom_errorbar(aes(ymax = U, ymin = L))
-}
-
 # center with 'apply()'
 center_apply <- function(x) {
   apply(x, 2, function(y) y - mean(y))
 }
+
 #sample function that works with single integer
 resamp <- function(x,...){if(length(x)==1) x else sample(x,...)} 
+
 #possible parent recovering function
 possparents <- function(x, amat){
   posspaX <- which(amat[x,]==1)
   return(posspaX)
 }
+
 # parents recovering function
 parents <- function(x, amat){
   paX <- setdiff(possparents(x,amat),which((amat[,x] + t(amat[x,]))==2))
   return(paX)
 }
+
 # descendants recovering function
 de <- function(x, amat){
   deX <- setdiff(pcalg::possDe(amat,x,type="dag"),x)
   return(deX)
 }
+
 # O-set recovering function
 ComputeO <- function(x,y,amat){
   

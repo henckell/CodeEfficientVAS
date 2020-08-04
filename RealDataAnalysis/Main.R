@@ -6,11 +6,9 @@ library(EnvStats)
 library(gridExtra)
 library(grid)
 
-setwd("~/Dokumente/Papers/Rcode/CodeEfficientVAS/RealDataAnalysis")
-
 #### getting necessary functions
 
-source("~/Dokumente/Papers/Rcode/CodeEfficientVAS/RealDataAnalysis/helpFunctions.R")
+source("~/CodeEfficientVAS/RealDataAnalysis/helpFunctions.R")
 
 #### preparing data
 baseData1 <- read_xls("Data/1. cd3cd28.xls")
@@ -36,7 +34,7 @@ baseData<- data.transform(baseData)
 
 # colnames(baseData) <- c()
 
-#### things related to only B
+#### adjacency matrices for our three graphs, as well as their tweaked versions
 # Consensus graph
 B <- t(matrix(c(0,0,0,0,0,0,0,1,1,0,0,
                1,0,0,0,0,0,0,1,1,0,0,
@@ -169,7 +167,7 @@ names<-c("Raf","Mek","PLCg","PIP2","PIP3","Erk","Akt","PKA","PKC","p38","JNK")
 rownames(D) <- names
 colnames(D) <- names
 
-
+## main function to compute estimated variances for all appropriate pairs (X,Y)
 MainFunction <- function(Data,B){
   baseData<- data.transform(Data)
   
@@ -178,14 +176,13 @@ MainFunction <- function(Data,B){
   descendants <- lapply(x,de,B)
   length.de <- sapply(descendants,length)
   no.de <- which(length.de==0)
-
-#### combining B and data to compute CIs of interest
-
   res<-list()
   loi<-c()
 
-
+  # removing all nodes that have no descendant from the consideration for X
   x.clean <- setdiff(x,no.de)
+  
+  # computing and saving all descendants for each node in the graph
   for(i in 1:length(x.clean)){
     j<-which(x==x.clean[i])
     soi <- descendants[[j]]
@@ -201,6 +198,7 @@ MainFunction <- function(Data,B){
   
   res <- list()
   
+  # computing estimated variances for all apropriate pairs
   for(i in 1:length(x.clean)){
     j<-which(x==x.clean[i])
     soi <- descendants[[j]]
@@ -222,9 +220,6 @@ MainFunction <- function(Data,B){
       n1<-n1+1
     }
   }
-  # lengthCI.O <- oCI[,2] - oCI[,1]
-  # lengthCI.pa <- paCI[,2] - paCI[,1]
-  # lengthCI.e <- eCI[,2] - eCI[,1]
   
   ratio <- SE.O/SE.pa
   
@@ -232,6 +227,7 @@ MainFunction <- function(Data,B){
 }
 
 
+# computing all estimated variances for consensus graph in the 8 exp. conditions
 B1 <- MainFunction(baseData1,B)
 B3 <- MainFunction(baseData3,B)
 B4 <- MainFunction(baseData4,B)
@@ -241,6 +237,7 @@ B7 <- MainFunction(baseData7,B.2)
 B8 <- MainFunction(baseData8,B)
 B9 <- MainFunction(baseData9,B)
 
+# removing cases where O=P
 b1 <- B1$ratio[-which(B1$ratio==1)]
 b3 <- B3$ratio[-which(B3$ratio==1)]
 b4 <- B4$ratio[-which(B4$ratio==1)]
@@ -250,6 +247,7 @@ b7 <- B7$ratio[-which(B7$ratio==1)]
 b8 <- B8$ratio[-which(B8$ratio==1)]
 b9 <- B9$ratio[-which(B9$ratio==1)]
 
+# computing all estimated variances for Sachs et al. graph in the 8 exp. conditions
 C1 <- MainFunction(baseData1,C)
 C3 <- MainFunction(baseData3,C)
 C4 <- MainFunction(baseData4,C)
@@ -259,6 +257,7 @@ C7 <- MainFunction(baseData7,C.2)
 C8 <- MainFunction(baseData8,C)
 C9 <- MainFunction(baseData9,C)
 
+# removing cases where O=P
 c1 <- C1$ratio[-which(C1$ratio==1)]
 c3 <- C3$ratio[-which(C3$ratio==1)]
 c4 <- C4$ratio[-which(C4$ratio==1)]
@@ -269,6 +268,7 @@ c8 <- C8$ratio[-which(C8$ratio==1)]
 c9 <- C9$ratio[-which(C9$ratio==1)]
 
 
+# computing all estimated variances for Mooij and Heskes graph in the 8 exp. conditions
 D1 <- MainFunction(baseData1,D)
 D3 <- MainFunction(baseData3,D)
 D4 <- MainFunction(baseData4,D)
@@ -278,6 +278,7 @@ D7 <- MainFunction(baseData7,D.2)
 D8 <- MainFunction(baseData8,D)
 D9 <- MainFunction(baseData9,D)
 
+# removing cases where O=P
 d1 <- D1$ratio[-which(D1$ratio==1)]
 d3 <- D3$ratio[-which(D3$ratio==1)]
 d4 <- D4$ratio[-which(D4$ratio==1)]
@@ -287,12 +288,11 @@ d7 <- D7$ratio[-which(D7$ratio==1)]
 d8 <- D8$ratio[-which(D8$ratio==1)]
 d9 <- D9$ratio[-which(D9$ratio==1)]
 
-## pooled violin plots with geomeans added as red dots
 
+## pooled violin plots with geomeans added as red dots and medians as black dot
 y1 <- c(b1,b3,b4,b5,b6,b7,b8,b9)
 y2 <- c(c1,c3,c4,c5,c6,c7,c8,c9)
 y3 <- c(d1,d3,d4,d5,d6,d7,d8,d9)
-
 Y <- c(y1,y2,y3)
 
 dat <- data.frame(y=c(y1,y2,y3),x=c(rep(1,length(y1)),rep(2,length(y2)),rep(3,length(y3))))

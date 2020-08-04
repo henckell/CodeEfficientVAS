@@ -28,27 +28,22 @@ causalEffectLeo <- function (B, y, x) {
 }
 
 ## function that computes possiple parents
-
 possparents <- function(x, amat){
   posspaX <- which(amat[x,]==1)
   return(posspaX)
 }
 
 ## function that computes parents 
-
 parents <- function(x, amat){
   paX <- setdiff(possparents(x,amat),which((amat[,x] + t(amat[x,]))==2))
   return(paX)
 }
 
 ## redone samp function that fixes issue when pluggin in a vector of length 1
-
 resamp <- function(x,...){if(length(x)==1) x else sample(x,...)} 
 
-##
 
 ## function that computes O given x,y and the dag.amat matrix of a graph, works for amenable CPDAGs as well
-
 ComputeO <- function(x,y,amat){
   
   ## obtaining forb(x,y,G)
@@ -82,7 +77,6 @@ ComputeO <- function(x,y,amat){
 
 
 ## help lm function
-
 lmLeo <- function(data,x,y,set,X,Y){
   k<- length(x)
   if(length(set)==0 & k==1){
@@ -95,8 +89,7 @@ lmLeo <- function(data,x,y,set,X,Y){
   return(Beta)
 }
 
-## function that given B and epsilon computes covariance matrix for the DAG
-
+## function that given B and epsilon computes covariance matrix for the causal linear models
 Covariance <- function(B,eps){
   n <- nrow(B)
   Id <- diag(n)

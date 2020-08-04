@@ -1,7 +1,10 @@
-
-#source("/u/henckell/Dokumente/Papers/research/new/DraftPapers/Leo/efficiency-adjustment/Rcode/simulation-paper.R")
-setwd("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Simulations")
-source("~/Dokumente/Papers/Rcode/CodeEfficientVAS/MainFunctions")
+setwd("/CodeEfficientVAS")
+source("/Simulations/MainFunctions.R")
+source("/Simulations/MinorFunctions/helpFunctions.R")
+source("/Simulations/MinorFunctions/gacFix.R")
+source("/Simulations/MinorFunctions/DataGenFunction.R")
+# setwd("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Simulations")
+# source("~/Dokumente/Papers/Rcode/CodeEfficientVAS/MainFunctions")
 
 library("pcalg")
 library("MASS")
@@ -58,6 +61,7 @@ finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
 }
 
 possible.x.size <- c(1) 
+seed1<-1
 
 finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
   set.seed(i)

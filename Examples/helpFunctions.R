@@ -1,3 +1,5 @@
+# given adjacency matrix and error variances for a causal linear model
+# computes the covariance matrix
 Covariance <- function(B,eps){
   n <- nrow(B)
   Id <- diag(n)
@@ -5,7 +7,8 @@ Covariance <- function(B,eps){
   return(Cov)
 }
 
-
+# computed the asymptotic variance for the 
+# OLS regression coefficient corresponding to X in the regression Y~X+W
 aVar <- function(x,y,W,CovG){
   if(length(W)==0){
     sigma_xx <- CovG[x,x]

@@ -1,10 +1,8 @@
 library("xtable")
 
-setwd("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Examples")
-
 #### getting necessary functions
 
-source("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Examples/helpFunctions.R")
+source("~/CodeEfficientVAS/Examples/helpFunctions.R")
 
 set.seed(1)
 

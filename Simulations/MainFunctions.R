@@ -8,19 +8,11 @@ library(ggm)
 ##generateB: to help generating appropriate adjacency matrices
 ##MainFunction: to sample linear causal models, generate data and collect estimates to compute empirical MSEs
 
-setwd("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Simulations")
-
-# import functions
-source("MinorFunctions/gacFix.R")
-source("MinorFunctions/DataGenFunction.R")
-source("MinorFunctions/helpFunctions.R")
-
 ## function that given data and adjustment sets of interest computes the corresponding regression coefficients
 data.eval <- function(x,y,data,cpdag.permitted,cpdag.desc,
                       paX.dag,adjust.dag,all.dag,all.nforb.dag,O.dag,
                       paX.cpdag,adjust.cpdag,all.cpdag,all.nforb.cpdag,O.cpdag,
                       allowed=0){
-  ## generating data for constructed graph G
   
   k <- length(x)
   n<-6
@@ -72,7 +64,7 @@ data.eval <- function(x,y,data,cpdag.permitted,cpdag.desc,
 }
 
 
-
+# function to generate appropriate adjacency matrices
 generateB <- function(size, neigh, graph.type){
   G <- randDAG(size, neigh, graph.type)
   
@@ -420,4 +412,4 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
 }
 
 ## Example run
-MainFunction(10,2,1000,100)
+# MainFunction(10,2,1000,100)
