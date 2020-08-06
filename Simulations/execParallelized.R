@@ -1,7 +1,6 @@
 setwd("/CodeEfficientVAS")
 source("/Simulations/MainFunctions.R")
 source("/Simulations/MinorFunctions/helpFunctions.R")
-source("/Simulations/MinorFunctions/gacFix.R")
 source("/Simulations/MinorFunctions/DataGenFunction.R")
 # setwd("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Simulations")
 # source("~/Dokumente/Papers/Rcode/CodeEfficientVAS/MainFunctions")
