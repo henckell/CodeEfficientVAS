@@ -2,8 +2,6 @@ setwd("/CodeEfficientVAS")
 source("/Simulations/MainFunctions.R")
 source("/Simulations/MinorFunctions/helpFunctions.R")
 source("/Simulations/MinorFunctions/DataGenFunction.R")
-# setwd("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Simulations")
-# source("~/Dokumente/Papers/Rcode/CodeEfficientVAS/MainFunctions")
 
 library("pcalg")
 library("MASS")
@@ -24,7 +22,7 @@ possible.x.size <- c(2,3) # <- c(1) ## change for singleton X simulation
 num_setings  <-  5000
 seed1<-1
 
-# ptm <- proc.time()
+# |X| either two or three simulation
 
 finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
   set.seed(i)
@@ -53,14 +51,14 @@ finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
                  Beta=Res$Beta,Bias=Res$Bias, Var=Res$Var, MSE=Res$MSE,
                  Issues=Res$Issues,adj.dag = Res$adj.dag, adj.cpdag = Res$adj.cpdag, allowed.cpdag = Res$allowed.cpdag,
                  Sizes=Res$Sizes,Sizes.cpdag=Res$size.cpdag)
-  # save(file="/userdata/henckell/MSEquicktest.Rdata", Output)
   
-  save(file=paste("/userdata/henckell/joint/resJointX",i,".Rdata",sep = ""),Output)
- #  save(file=paste("/Users/henckell/Dokumente/res",i,".Rdata",sep = ""),Output)
+  save(file=paste("/data/resJointX",i,".Rdata",sep = ""),Output)
 }
 
+# |X|=1 simulation
+
 possible.x.size <- c(1) 
-seed1<-1
+seed1<-1 # reset seed
 
 finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
   set.seed(i)
@@ -89,10 +87,8 @@ finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
                  Beta=Res$Beta,Bias=Res$Bias, Var=Res$Var, MSE=Res$MSE,
                  Issues=Res$Issues,adj.dag = Res$adj.dag, adj.cpdag = Res$adj.cpdag, allowed.cpdag = Res$allowed.cpdag,
                  Sizes=Res$Sizes,Sizes.cpdag=Res$size.cpdag)
-  # save(file="/userdata/henckell/MSEquicktest.Rdata", Output)
   
-  save(file=paste("/userdata/henckell/joint/resSingleX",i,".Rdata",sep = ""),Output)
-  #  save(file=paste("/Users/henckell/Dokumente/res",i,".Rdata",sep = ""),Output)
+  save(file=paste("/data/resSingleX",i,".Rdata",sep = ""),Output)
 }
 
 
