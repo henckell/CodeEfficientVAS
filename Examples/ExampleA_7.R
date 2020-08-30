@@ -6,6 +6,8 @@ setwd("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Examples")
 
 source("~/Dokumente/Papers/Rcode/CodeEfficientVAS/Examples/helpFunctions.R")
 
+RNGkind(sample.kind = "Rounding")
+
 # setting sample size
 n <- 1000
 

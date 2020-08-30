@@ -1,7 +1,7 @@
-setwd("/CodeEfficientVAS")
-source("/Simulations/MainFunctions.R")
-source("/Simulations/MinorFunctions/helpFunctions.R")
-source("/Simulations/MinorFunctions/DataGenFunction.R")
+setwd(".../CodeEfficientVAS")
+source("Simulations/MainFunctions.R")
+source("Simulations/MinorFunctions/helpFunctions.R")
+source("Simulations/MinorFunctions/DataGenFunction.R")
 
 library("pcalg")
 library("MASS")
@@ -52,12 +52,11 @@ finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
                  Issues=Res$Issues,adj.dag = Res$adj.dag, adj.cpdag = Res$adj.cpdag, allowed.cpdag = Res$allowed.cpdag,
                  Sizes=Res$Sizes,Sizes.cpdag=Res$size.cpdag)
   
-  save(file=paste("/data/resJointX",i,".Rdata",sep = ""),Output)
+  save(file=paste("data/resJointX",i,".Rdata",sep = ""),Output)
 }
 
 # |X|=1 simulation
 
-possible.x.size <- c(1) 
 seed1<-1 # reset seed
 
 finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
@@ -69,7 +68,7 @@ finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
   neigh <- sample(possible_neigh,1)
   graph.type <- sample(possible_graph.type,1)
   sample.size <- sample(possible_sample.size,1) 
-  x.size <- sample(possible.x.size,1)
+  x.size <- 1
   
   error.type <- sample(c("normal","not-normal"),1)
   
@@ -88,7 +87,7 @@ finalRes <- foreach(i=seed1: num_setings,.packages = 'pcalg') %dopar%{
                  Issues=Res$Issues,adj.dag = Res$adj.dag, adj.cpdag = Res$adj.cpdag, allowed.cpdag = Res$allowed.cpdag,
                  Sizes=Res$Sizes,Sizes.cpdag=Res$size.cpdag)
   
-  save(file=paste("/data/resSingleX",i,".Rdata",sep = ""),Output)
+  save(file=paste("data/resSingleX",i,".Rdata",sep = ""),Output)
 }
 
 

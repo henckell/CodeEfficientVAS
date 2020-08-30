@@ -4,6 +4,8 @@ library("xtable")
 
 source("~/CodeEfficientVAS/Examples/helpFunctions.R")
 
+RNGkind(sample.kind = "Rounding")
+
 set.seed(1)
 
 ## all edge weights one
@@ -50,3 +52,4 @@ for(i in 1:8){
 
 # table of variances for Example 3.5
 xtable(SavedResults[,1:6])
+

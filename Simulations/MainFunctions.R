@@ -104,19 +104,18 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
   n <- 6
   
   #### generate DAG and compute matters of interest from it 
-  set<- 1:size
+  set<- numeric(0)
   DescendantsSize <- 0
   allowed <- 1
   tcpdag.permitted <- 0
   
-  B.dag <- generateB(size, neigh, graph.type)
-
-  amat.dag <- B.dag
-  amat.dag[B.dag != 0] <- 1
+  # B.dag <- generateB(size, neigh, graph.type)
+  # 
+  # amat.dag <- B.dag
+  # amat.dag[B.dag != 0] <- 1
   
   ## loop that draws x till de(x) \neq \emptyset
   while(DescendantsSize==0 | allowed!=0 | tcpdag.permitted == 0){
-    #if(length(set)==0) break
     
     if(length(set)<=x.size-1){
       set<-1:size
@@ -147,7 +146,7 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
       ## drawing a y that is a descendant of x
       y <- resamp(deX.dag,1)
       
-      true.cpdag <- dag2essgraph(B.dag)
+      true.cpdag <- dag2essgraph(t(B.dag))
       amat.truecpdag <- t(as(true.cpdag,"matrix"))
       amat.truecpdag[amat.truecpdag != 0] <- 1
       
@@ -157,11 +156,10 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
       allowed <- length(intersect(Forbidden,c(x)))
       }
     
-    if(tcpdag.permitted == 0 | allowed >= 1){
+    if(tcpdag.permitted == 0 | allowed >= 1){ 
       DescendantsSize <- 0
       set <- setdiff(set, x) 
     }
-    
 
   }
   
@@ -362,9 +360,9 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
   
   ####  evaluating the computed regression coefficients 
   for(k in 1:x.size){
-  colnames(Beta[[k]]) <- c("empty","paX DAG","adjust DAG","all DAG","all n-forb DAG","O DAG",
+  colnames(Beta[[k]]) <- c("empty","paX DAG","adjust DAG","all DAG","all n-forb DAG","O DAG","empty est. CPDAG",
                            "paX est. CPDAG","adjust est. CPDAG","all est. CPDAG","all n-forb est. CPDAG",
-                      "O est. CPDAG","empty est. CPDAG")
+                      "O est. CPDAG")
   }
   
   Bias.l <- lapply(1:x.size, function(k) (apply(Beta[[k]],2,mean,na.rm = TRUE) - CE[k]))
@@ -412,4 +410,4 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
 }
 
 ## Example run
-# MainFunction(10,2,1000,100)
+# MainFunction(10,2,1000,100, x.size=2)
