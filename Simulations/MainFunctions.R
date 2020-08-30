@@ -79,7 +79,7 @@ generateB <- function(size, neigh, graph.type){
   randomMatrix[subset]<--1
   B.dag=B.dag*randomMatrix
   
-  ## topologically order B
+  ## topologically order B for convenience
   topo.order <- topoSort(G)
   topo.order <- unlist(topo.order)
   
@@ -103,7 +103,7 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
   ## setting number of sets because less work this way in the future to change
   n <- 6
   
-  #### generate DAG and compute matters of interest from it 
+  #### generate DAG and sample appropriate pair (X,Y)
   set<- numeric(0)
   DescendantsSize <- 0
   allowed <- 1
@@ -114,7 +114,9 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
   # amat.dag <- B.dag
   # amat.dag[B.dag != 0] <- 1
   
-  ## loop that draws x till de(x) \neq \emptyset
+  ## loop that draws G and X till there 
+  ## i) exists a Y \in \de(X,G) 
+  ## ii) such that the true CPDAG C of G is amenable relative to (X,Y)
   while(DescendantsSize==0 | allowed!=0 | tcpdag.permitted == 0){
     
     if(length(set)<=x.size-1){
@@ -122,36 +124,42 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
       DescendantsSize <- 0
       allowed <- 1
       
+      # generate DAG
       B.dag <- generateB(size, neigh, graph.type)
       
       amat.dag <- B.dag
       amat.dag[B.dag != 0] <- 1
     }
   
-    ##ema: changed to sample x
+    ## sample X
     x <- resamp(set,x.size)
 
-    ##get desc of x
+    ##get descendants of x
     deX.dag <- c()  
     deX.dag <- lapply(x,2,FUN=pcalg::possDe,m=B.dag,type="dag")
     deX.dag <- unique(Reduce(intersect, deX.dag))
     
     
     deX.dag <- setdiff(deX.dag,x)
+    
+    # check how many descendants there are
     DescendantsSize <- length(deX.dag)
     tcpdag.permitted <- 0
     
-    if(DescendantsSize==0){set = setdiff(set,x)}
+    if(DescendantsSize==0){set = setdiff(set,x)} 
     else{
       ## drawing a y that is a descendant of x
       y <- resamp(deX.dag,1)
       
+      # computing true CPDAG C
       true.cpdag <- dag2essgraph(t(B.dag))
       amat.truecpdag <- t(as(true.cpdag,"matrix"))
       amat.truecpdag[amat.truecpdag != 0] <- 1
       
+      # checking whether C is amenable
       tcpdag.permitted <- pcalg:::isAmenable(amat.truecpdag,x,y,type="cpdag") 
       
+      # checking whether a non-causal path consisting of only forbidden nodes exists in G
       Forbidden <- pcalg:::forbiddenNodes(amat.dag,x,y)
       allowed <- length(intersect(Forbidden,c(x)))
       }
@@ -169,8 +177,6 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
   paX.dag <- lapply(x,parents,amat=amat.dag)
   paX.dag <- unique(Reduce(union, paX.dag))
   paX.dag <- setdiff(paX.dag,x)
-  
-  #Forbidden <- pcalg:::forbiddenNodes(amat.dag,x,y)
 
   adjust.dag <- lapply(union(x,y),pcalg:::possAn,m=amat.dag,type="dag",possible=FALSE)
   adjust.dag <- unique(Reduce(union, adjust.dag))
@@ -187,9 +193,6 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
 
   ## computing causal effect
   CE <- causalEffectLeo(B.dag,y,x)
-  ####
-  
-  #### true CPDAG
 
   
   ## store sizes of sets of interest
@@ -219,8 +222,6 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
   descend.issues <-numeric(reps) 
   amen.issues <- numeric(reps)
   
-  #Beta <- matrix(numeric(7*reps),ncol=7)
-
   Beta <- lapply(1:x.size,function(x) matrix(numeric(2*n*reps),ncol=2*n))
   size.cpdag <- matrix(numeric((n-1)*reps),ncol=(n-1))
   allowed.cpdag <- numeric(reps)
@@ -259,6 +260,7 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
   
   for(i in 1:reps){
     
+    ## generate Data
     if(error.type == "unif"){
       Data <- DataGenUnif(sample.size,B.dag,limit)
     }
@@ -272,7 +274,6 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
     }
 
     if(error.type=="normal"){
-    ## generated data given covariance matrix of the DAG
     Data <- mvrnorm(sample.size,rep(0,size),CovG)
     
     ## tranform data to format required by ges
@@ -286,6 +287,7 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
     amat.cpdag <- t(as(cpdag,"matrix"))
     amat.cpdag[amat.cpdag != 0] <- 1
     } else{
+      ## Estimating DAG for non-normal errors
       amat.cpdag <- lingam(Data)$Bpruned
        amat.cpdag[amat.cpdag != 0] <- 1
     }
@@ -296,7 +298,7 @@ MainFunction <- function(size, neigh, sample.size, reps, graph.type="er",
     amen.issues[i] <- cpdag.permitted
 
 
-    ## store whether y is an ancestor of x in the estimated CPDAG
+    ## store whether y is an ancestor of x in the estimated CPDAG/DAG
     AnY <- pcalg:::possibleAnProper(amat.cpdag,y)
     y.desc.x <- length(intersect(x,AnY))
     cpdag.desc <- c(0)
